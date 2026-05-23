@@ -23,7 +23,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -91,6 +93,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
         ModalNavigationDrawer(
             drawerState = drawerState,
+            gesturesEnabled = false,
             drawerContent = {
                 ModalDrawerSheet(
                     modifier = Modifier.width(300.dp),
@@ -98,7 +101,10 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     drawerContentColor = Color.White
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp).fillMaxHeight()
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxHeight()
+                            .verticalScroll(rememberScrollState())
                     ) {
                         Text("Better GFN Settings", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         Spacer(modifier = Modifier.height(16.dp))
@@ -158,9 +164,17 @@ class MainActivity : ComponentActivity(), SensorEventListener {
                     factory = { context ->
                         WebView(context).apply {
                             webView = this
+                            
+                            // Enable cookie manager
+                            val cookieManager = android.webkit.CookieManager.getInstance()
+                            cookieManager.setAcceptCookie(true)
+                            cookieManager.setAcceptThirdPartyCookies(this, true)
+
                             settings.apply {
                                 javaScriptEnabled = true
                                 domStorageEnabled = true
+                                databaseEnabled = true
+                                javaScriptCanOpenWindowsAutomatically = true
                                 mediaPlaybackRequiresUserGesture = false
                                 useWideViewPort = true
                                 loadWithOverviewMode = true
